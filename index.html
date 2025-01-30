@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Mi economia</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link rel="stylesheet" href="./resources/css/styles.css">
+</head>
+<body>
+    <h1>Mi aplicacion para gastos</h1>
+    <div class="row">
+        <div class="col l5 offset-l1 s12">  <!--L = PC S=moviles --> 
+           <table id="transactionTable">
+                <caption>Historial de transacciones</caption>
+                <tr>
+                    <th>Tipo</th>
+                    <th>Descripcion</th>
+                    <th>Monto</th>
+                    <th>Categoria</th>
+                    <th>Eliminar</th>
+                </tr>
+            </table>
+        </div>
+        
+        <div class="col l5 s12">  <!--pone la columna horizontal de ingreso de datos-->
+            <div class="col s8 offset-s2">
+            <form id="transactionForm">
+                <div class="formField">                   
+            <p>
+                <span>transaccion</span>
+                <label>
+                  <i class="material-icons">add</i>
+                  <input value="Ingreso" class="with-gap" name="transactionType" type="radio" checked />
+                  <span>Ingreso</span>
+                  
+                </label>
+                <label>
+                    <i class="material-icons">remove</i>
+                    <input value="Egreso" class="with-gap" name="transactionType" type="radio" checked />
+                    <span>Egreso</span>
+                   
+                  </label>
+            </p>
+                                  
+        </div>
+               
+        <div class="input-field">
+            <label for="transactionDescription">Descripcion</label>
+            <input class="validate" id="transactionDescription" name="transactionDescription" type="text">
+        </div>
+
+        <div class="input-field">
+            <label for="transactionAmount">Monto</label> 
+            <input class="validate" id="transactionAmount" name="transactionAmount" type="number">
+        </div>
+        
+        <div class="formField">
+            <label for="transactionCategory">Categoria</label> 
+            <select class="browser-default" id="transactionCategory" name="transactionCategory">
+           
+            </select>    
+       
+        </div>
+
+       
+        <button class="btn waves-effect waves-light" type="submit" name="action">
+            Añadir <i class="material-icons right">send</i>
+          </button>
+               
+            </form>
+        </div>    
+    </div>
+        
+    </div>
+    <!--pagina materialize css opcion get started - cdn -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="resources/js/scripts.js"></script>
+</body>
+
+</html>
