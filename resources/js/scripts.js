@@ -9,12 +9,11 @@ form.addEventListener("submit", function(event) {
    form.reset();           
 })
 
-
 // carga las categorias a un array y ejecuta funcion insertCategory 
 // que lo carga en el html
 function draw_category() {
     let allCategories = [
-        "Alquiler","Comida","Diversion","Antojo","Gasto","transporte" 
+        "Alquiler","Comida","Diversion","Antojo","Gasto","transporte","Salario" 
     ]
     for (let index = 0; index < allCategories.length; index++) {
         insertCategory(allCategories[index])
