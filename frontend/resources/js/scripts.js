@@ -1,188 +1,198 @@
-const { Console } = require("console");
+// frontend/scripts.js
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('transactionForm');
+  const table = document.getElementById('transactionTable');
+  const categorySelect = document.getElementById('transactionCategory');
+  const API_URL = 'http://localhost:3000/transactions'; // cambia a tu URL en Render
 
-const form = document.getElementById("transactionForm");
-     
-form.addEventListener("submit", function(event) {
-   event.preventDefault(); // se cancela el evento no se envia al servidor
-   let transactionFormData = new FormData(form);
-   let transactionObj = ConvertFormDataToTransactionObj(transactionFormData);
-   saveTransactionObj(transactionObj);
-   insertRowInTransactionTable(transactionObj);
-   form.reset();           
-})
+  const API_CATEGORIES = 'http://localhost:3000/categories';
 
-// carga las categorias a un array y ejecuta funcion insertCategory 
-// que lo carga en el html
-function draw_category() {
-    let allCategories = [
-        "Alquiler","Comida","Diversion","Antojo","Gasto","transporte","Salario" 
-    ]
-    for (let index = 0; index < allCategories.length; index++) {
-        insertCategory(allCategories[index])
-    }
-}
+  // --- 🔹 CRUD de Categorías ---
+  const categoryForm = document.getElementById('categoryForm');
+  const categoryTable = document.getElementById('categoryTable');
 
-function insertCategory(categoryName) {
-    const selectElement = document.getElementById("transactionCategory")
-    let htmlToInsert = `<option> ${categoryName} </option>`
-    selectElement.insertAdjacentHTML("beforeend", htmlToInsert) 
-}
-
-function isValidTransactionForm(transactionObj) {
-    let isValidForm = true;
-    if (!transactionObj["transactionType"]) {
-        alert("Tu transaction type no es valido. ponele algo")
-        isValidForm = false;
-    }
-    
-    if (!transactionObj["transactionDescription"]) {
-        alert("Debes colocar algo en el transaction description")
-        isValidForm = false;
-    }
-    
-    if (!transactionObj["transactionAmount"]) {
-        alert("Debes colicar un monto")
-        isValidForm = false;
-    } else if (transactionObj["transactionAmount"] < 0) {
-        alert("No puedes poner numeros negativos")
-        isValidForm = false;
-    }
-    
-    if (!transactionObj["transactionCategory"]) {
-        alert("Debes colocar una categoria")
-        isValidForm = false;
-    }
-    return isValidForm;
-}
-
-window.addEventListener("unhandledrejection",function (event) {
-    Console.console.warn(`ahora si: UNHANDLOAD PERMISE REJECTION: $
-    {EVENT.REASON}`);
-    Console.info("AHORA SI ANDA xd");
-    event.preventDefault();
-});
-
-
-document.addEventListener("DOMContentLoaded", function(event) {
-    draw_category()
-    // obtiene desde local storage, la informacion de las transaccion
-    // let transactionArr = JSON.parse(localStorage.getItem("transactionData"));
-    // obtiene las transacciones desde el servidor
-    fetch("http://localhost:3000/transactions")
-        .then(function(respuesta) {
-          return respuesta.json();
-        })
-        .then((data) => mostrarEnPantallaArrayDeTransaccion(data))
-        .catch(function(error) {
-           console.log("Hubo un error de conexión");
-           document.getElementById("errorMensaje").innerText  =
-           "Hubo un error, actualiza la pagína";
+  // Cargar categorías
+  function loadCategories() {
+    fetch(API_CATEGORIES)
+      .then(res => res.json())
+      .then(data => {
+        // Poblar select
+        categorySelect.innerHTML = "";
+        data.forEach(cat => {
+          const option = document.createElement('option');
+          option.value = cat;
+          option.textContent = cat;
+          categorySelect.appendChild(option);
         });
-});
 
-function mostrarEnPantallaArrayDeTransaccion(transactionObjArr){
-    transactionObjArr.forEach(
-        function(arrayElement) {
-            insertRowInTransactionTable(arrayElement)
-        } 
-    )
-}
+        // Poblar tabla
+        categoryTable.innerHTML = `
+          <tr>
+            <th>Nombre</th>
+            <th>Editar</th>
+            <th>Eliminar</th>
+          </tr>`;
+        data.forEach(cat => addCategoryToTable(cat));
+      });
+  }
 
-function getTransactionsFormApi() {
-    // llama al backend
-    // obtiene las transacciones 
-    // y guardalas en un array
-    const allTransactions = fetch("http://localhost:3000/transactions");
-    return allTransactions;
-}
-         
-// agrega el id del registro
-function getNewTransacitionId () {
-   let lastTransactionId = localStorage.getItem("lastTransactionId") || "-1"
-   let newTransactionId =  JSON.parse(lastTransactionId) + 1;
-   localStorage.setItem("lastTransactionId",JSON.parse(newTransactionId))
-   return newTransactionId;
-} 
+  // Crear categoría
+  categoryForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const newCat = categoryForm.categoryName.value;
 
-
-function ConvertFormDataToTransactionObj(transactionFormData) {
-    let transactionType = transactionFormData.get("transactionType");
-    let transactionDescription = transactionFormData.get("transactionDescription");
-    let transactionAmount = transactionFormData.get("transactionAmount");
-    let transactionCategory = transactionFormData.get("transactionCategory");
-    let transaccionId = getNewTransacitionId() ;
-    return {
-        "transactionType": transactionType,
-        "transactionDescription": transactionDescription,
-        "transactionAmount": transactionAmount,
-        "transactionCategory": transactionCategory,
-        "transaccionId": transaccionId
-    };        
-}
-
-function insertRowInTransactionTable(transactionObj) {
-    let transactionTableRef = document.getElementById("transactionTable");
-   
-    let newTransactionRowRef = transactionTableRef.insertRow(-1);
-    newTransactionRowRef.setAttribute("data-transaction-Id",transactionObj["transaccionId"]);
-    
-    let newTypeCellRef = newTransactionRowRef.insertCell(0);
-    newTypeCellRef.textContent = transactionObj.transactionType;
-    
-    newTypeCellRef = newTransactionRowRef.insertCell(1);
-    newTypeCellRef.textContent = transactionObj.transactionDescription;
-    
-    newTypeCellRef = newTransactionRowRef.insertCell(2);
-    newTypeCellRef.textContent = transactionObj.transactionAmount;
-
-    newTypeCellRef = newTransactionRowRef.insertCell(3);
-    newTypeCellRef.textContent = transactionObj.transactionCategory;
-
-    let newDeleteCell = newTransactionRowRef.insertCell(4);
-    let deleteButton = document.createElement("button");
-    deleteButton.textContent = "Eliminar";
-    newDeleteCell.appendChild(deleteButton)
-    
-    deleteButton.addEventListener("click", (event) => {
-        // tengo la fila que quiero borrar
-        let transactionRow = event.target.parentNode.parentNode;
-        console.log(transactionRow)
-        // tomo el valor del atributo "data-transaction-Id" el Id 
-        let transaccionId = transactionRow.getAttribute("data-transaction-Id"); 
-        console.log(transaccionId)
-        // console.log(transactionRow.getAttribute("data-transaction-id"))
-        // elimina la fila del html
-        transactionRow.remove();
-        // elimina la fila del localStorage
-        deleteTransactionObj(transaccionId);
+    fetch(API_CATEGORIES, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: newCat })
     })
-}
+    .then(res => res.json())
+    .then(() => {
+      console.log('🟢 Categoría creada');
+      loadCategories();
+      categoryForm.reset();
+    });
+  });
 
-//le paso como parametro el transactionId de la transaccion que quiero eliminar
-function deleteTransactionObj(transaccionId) {
-    // obtengo lo que hay en mi db (Desconvierto de json a obj)
-    // obtiene todas las transacciones del localStorage
-    let transactionArr = JSON.parse(localStorage.getItem("transactionData"));
-    // busco indice o posicion de la transaccion que quiero eliminar
-    let transaccionIndexInArray = transactionArr
-        .findIndex(element => element.transaccionId === transaccionId) || [];
-    // elimino el elemento de esa posicion ,1 me borrra un solo elemento
-    transactionArr.splice(transaccionIndexInArray, 1);
-    // convierto el obj a json
-    let transactionArryJSON = JSON.stringify(transactionArr);
-    // guardo mi array de transacciones en formato json en localstorage
-    localStorage.setItem("transactionData", transactionArryJSON);          
-}    
+  // Helper para tabla
+  function addCategoryToTable(cat) {
+    const row = categoryTable.insertRow();
+    row.insertCell().textContent = cat;
 
-    function saveTransactionObj(transactionObj) {
-    let myTransactionArray = JSON.parse(localStorage.getItem("transactionData")) || [];
-    if (!Array.isArray(myTransactionArray)) {
-         myTransactionArray = []; 
+    // Editar
+    const editCell = row.insertCell();
+    const editBtn = document.createElement('button');
+    editBtn.textContent = '✏️';
+    editBtn.className = 'btn blue';
+    editBtn.onclick = () => editCategory(cat);
+    editCell.appendChild(editBtn);
+
+    // Eliminar
+    const deleteCell = row.insertCell();
+    const deleteBtn = document.createElement('button');
+    deleteBtn.textContent = '🗑️';
+    deleteBtn.className = 'btn red';
+    deleteBtn.onclick = () => deleteCategory(cat);
+    deleteCell.appendChild(deleteBtn);
+  }
+
+  // Editar categoría
+  function editCategory(oldName) {
+    const newName = prompt('Nuevo nombre:', oldName);
+    if (newName) {
+      fetch(`${API_CATEGORIES}/${oldName}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ newName })
+      })
+      .then(res => res.json())
+      .then(() => {
+        console.log('🟡 Categoría modificada');
+        loadCategories();
+      });
     }
-    myTransactionArray.push(transactionObj);
-    // convierto mi array de transaccion a Json
-    let transactionArryJSON = JSON.stringify(myTransactionArray);
-    // guardo mi array de transacciones en formato json en localstorage
-    localStorage.setItem("transactionData", transactionArryJSON);          
-}
+  }
 
+  // Borrar categoría
+  function deleteCategory(name) {
+    fetch(`${API_CATEGORIES}/${name}`, { method: 'DELETE' })
+      .then(res => res.json())
+      .then(() => {
+        console.log('🔴 Categoría eliminada');
+        loadCategories();
+      });
+  }
+
+  
+
+  // Inicializar categorías
+  loadCategories();
+  // Cargar transacciones iniciales
+  fetch(API_URL)
+    .then(res => res.json())
+    .then(data => {
+      data.forEach(addTransactionToTable);
+    });
+
+  // Crear nueva transacción
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const transaccion = {
+      transactionType: form.transactionType.value,
+      transactionDescription: form.transactionDescription.value,
+      transactionAmount: form.transactionAmount.value,
+      transactionCategory: form.transactionCategory.value
+    };
+
+    fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(transaccion)
+    })
+    .then(res => res.json())
+    .then(data => {
+      console.log('🟢 Creada:', data);
+      addTransactionToTable(data.transaccion);
+    });
+  });
+
+  // Helper para agregar fila con botones
+  function addTransactionToTable(t) {
+    const row = table.insertRow();
+    row.dataset.id = t.transactionId;
+
+    row.insertCell().textContent = t.transactionType;
+    row.insertCell().textContent = t.transactionDescription;
+    row.insertCell().textContent = t.transactionAmount;
+    row.insertCell().textContent = t.transactionCategory;
+
+    // Botón editar
+    const editCell = row.insertCell();
+    const editBtn = document.createElement('button');
+    editBtn.textContent = '✏️';
+    editBtn.className = 'btn blue';
+    editBtn.onclick = () => editTransaction(row, t);
+    editCell.appendChild(editBtn);
+
+    // Botón eliminar
+    const deleteCell = row.insertCell();
+    const deleteBtn = document.createElement('button');
+    deleteBtn.textContent = '🗑️';
+    deleteBtn.className = 'btn red';
+    deleteBtn.onclick = () => deleteTransaction(row, t.transactionId);
+    deleteCell.appendChild(deleteBtn);
+  }
+
+  // Editar transacción
+  function editTransaction(row, t) {
+    const newDesc = prompt('Nueva descripción:', t.transactionDescription);
+    const newAmount = prompt('Nuevo monto:', t.transactionAmount);
+
+    if (newDesc && newAmount) {
+      const updated = { ...t, transactionDescription: newDesc, transactionAmount: newAmount };
+
+      fetch(`${API_URL}/${t.transactionId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updated)
+      })
+      .then(res => res.json())
+      .then(data => {
+        console.log('🟡 Modificada:', data);
+        row.cells[1].textContent = newDesc;
+        row.cells[2].textContent = newAmount;
+      });
+    }
+  }
+
+  // Borrar transacción
+  function deleteTransaction(row, id) {
+    fetch(`${API_URL}/${id}`, { method: 'DELETE' })
+      .then(res => res.json())
+      .then(data => {
+        console.log('🔴 Eliminada:', data);
+        row.remove();
+      });
+  }
+});

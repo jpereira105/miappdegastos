@@ -1,0 +1,23 @@
+[
+  {
+    "transactionType": "Egreso",
+    "transactionDescription": "SUPERMERCADO",
+    "transactionAmount": "250000",
+    "transactionCategory": "Comida",
+    "transactionId": 1764694213895
+  },
+  {
+    "transactionType": "Egreso",
+    "transactionDescription": "VIVIENDA",
+    "transactionAmount": "300000",
+    "transactionCategory": "Alquiler",
+    "transactionId": 1764694240919
+  },
+  {
+    "transactionType": "Egreso",
+    "transactionDescription": "SUELDO",
+    "transactionAmount": "2500000",
+    "transactionCategory": "SUELDO",
+    "transactionId": 1764694267271
+  }
+]
