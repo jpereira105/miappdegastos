@@ -1,7 +1,26 @@
 [
-  "Comida",
-  "Transporte",
-  "Servicios",
-  "Alquiler",
-  "sueldos"
+  {
+    "id": 1,
+    "name": "Comida"
+  },
+  {
+    "id": 2,
+    "name": "Transporte"
+  },
+  {
+    "id": 3,
+    "name": "Servicios"
+  },
+  {
+    "id": 4,
+    "name": "Alquiler"
+  },
+  {
+    "id": 5,
+    "name": "Sueldos"
+  },
+  {
+    "id": 7,
+    "name": "LIMPIEZA"
+  }
 ]
