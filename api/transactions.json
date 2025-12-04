@@ -19,5 +19,12 @@
     "transactionAmount": "2500000",
     "transactionCategory": "SUELDO",
     "transactionId": 1764694267271
+  },
+  {
+    "transactionType": "Egreso",
+    "transactionDescription": "PIZZAS",
+    "transactionAmount": "9000",
+    "transactionCategory": "1",
+    "transactionId": 1764877347032
   }
 ]

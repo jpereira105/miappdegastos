@@ -12,69 +12,52 @@ document.addEventListener('DOMContentLoaded', () => {
   const categoryTable = document.getElementById('categoryTable');
 
   // Cargar categorías
+
   function loadCategories() {
-    fetch(API_CATEGORIES)
-      .then(res => res.json())
-      .then(data => {
-        // Poblar select
-        categorySelect.innerHTML = "";
-        data.forEach(cat => {
-          const option = document.createElement('option');
-          option.value = cat;
-          option.textContent = cat;
-          categorySelect.appendChild(option);
-        });
-
-        // Poblar tabla
-        categoryTable.innerHTML = `
-          <tr>
-            <th>Nombre</th>
-            <th>Editar</th>
-            <th>Eliminar</th>
-          </tr>`;
-        data.forEach(cat => addCategoryToTable(cat));
-      });
-  }
-
-  // Crear categoría
-  categoryForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const newCat = categoryForm.categoryName.value;
-
-    fetch(API_CATEGORIES, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: newCat })
-    })
+  fetch(API_CATEGORIES, { cache: "no-store" })
     .then(res => res.json())
-    .then(() => {
-      console.log('🟢 Categoría creada');
-      loadCategories();
-      categoryForm.reset();
-    });
-  });
+    .then(data => {
+      // Poblar select
+      categorySelect.innerHTML = "";
+      data.forEach(cat => {
+        const option = document.createElement('option');
+        option.value = cat.id;        // usar id
+        option.textContent = cat.name; // mostrar nombre
+        categorySelect.appendChild(option);
+      });
 
-  // Helper para tabla
-  function addCategoryToTable(cat) {
-    const row = categoryTable.insertRow();
-    row.insertCell().textContent = cat;
+      // Poblar tabla
+      categoryTable.innerHTML = `
+        <tr>
+          <th>Nombre</th>
+          <th>Editar</th>
+          <th>Eliminar</th>
+        </tr>`;
+      data.forEach(cat => addCategoryToTable(cat));
+    })
+    .catch(err => console.error("Error cargando categorías:", err));
+}
 
-    // Editar
-    const editCell = row.insertCell();
-    const editBtn = document.createElement('button');
-    editBtn.textContent = '✏️';
-    editBtn.className = 'btn blue';
-    editBtn.onclick = () => editCategory(cat);
-    editCell.appendChild(editBtn);
+function addCategoryToTable(cat) {
+  const row = categoryTable.insertRow();
+  row.insertCell().textContent = cat.name;
 
-    // Eliminar
-    const deleteCell = row.insertCell();
-    const deleteBtn = document.createElement('button');
-    deleteBtn.textContent = '🗑️';
-    deleteBtn.className = 'btn red';
-    deleteBtn.onclick = () => deleteCategory(cat);
-    deleteCell.appendChild(deleteBtn);
-  }
+  // Editar
+  const editCell = row.insertCell();
+  const editBtn = document.createElement('button');
+  editBtn.textContent = '✏️';
+  editBtn.className = 'btn blue';
+  editBtn.onclick = () => editCategory(cat.id, cat.name);
+  editCell.appendChild(editBtn);
+
+  // Eliminar
+  const deleteCell = row.insertCell();
+  const deleteBtn = document.createElement('button');
+  deleteBtn.textContent = '🗑️';
+  deleteBtn.className = 'btn red';
+  deleteBtn.onclick = () => deleteCategory(cat.id);
+  deleteCell.appendChild(deleteBtn);
+}
 
   // Editar categoría
   function editCategory(oldName) {
@@ -138,31 +121,33 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Helper para agregar fila con botones
+  
   function addTransactionToTable(t) {
-    const row = table.insertRow();
-    row.dataset.id = t.transactionId;
+  const row = table.insertRow();
+  row.dataset.id = t.transactionId; // usar transactionId
 
-    row.insertCell().textContent = t.transactionType;
-    row.insertCell().textContent = t.transactionDescription;
-    row.insertCell().textContent = t.transactionAmount;
-    row.insertCell().textContent = t.transactionCategory;
+  row.insertCell().textContent = t.transactionType;
+  row.insertCell().textContent = t.transactionDescription;
+  row.insertCell().textContent = t.transactionAmount;
+  row.insertCell().textContent = t.transactionCategory;
 
-    // Botón editar
-    const editCell = row.insertCell();
-    const editBtn = document.createElement('button');
-    editBtn.textContent = '✏️';
-    editBtn.className = 'btn blue';
-    editBtn.onclick = () => editTransaction(row, t);
-    editCell.appendChild(editBtn);
+  // Botón editar
+  const editCell = row.insertCell();
+  const editBtn = document.createElement('button');
+  editBtn.textContent = '✏️';
+  editBtn.className = 'btn blue';
+  editBtn.onclick = () => editTransaction(row, t);
+  editCell.appendChild(editBtn);
 
-    // Botón eliminar
-    const deleteCell = row.insertCell();
-    const deleteBtn = document.createElement('button');
-    deleteBtn.textContent = '🗑️';
-    deleteBtn.className = 'btn red';
-    deleteBtn.onclick = () => deleteTransaction(row, t.transactionId);
-    deleteCell.appendChild(deleteBtn);
-  }
+  // Botón eliminar
+  const deleteCell = row.insertCell();
+  const deleteBtn = document.createElement('button');
+  deleteBtn.textContent = '🗑️';
+  deleteBtn.className = 'btn red';
+  deleteBtn.onclick = () => deleteTransaction(row, t.transactionId);
+  deleteCell.appendChild(deleteBtn);
+}
+
 
   // Editar transacción
   function editTransaction(row, t) {
