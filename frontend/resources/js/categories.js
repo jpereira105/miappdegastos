@@ -1,22 +1,31 @@
 // frontend/categories.js
+
 document.addEventListener('DOMContentLoaded', () => {
   const categoryForm = document.getElementById('categoryForm');
   const categoryTable = document.getElementById('categoryTable');
-  const API_CATEGORIES = 'http://localhost:4000/categories';
+  const API_CATEGORIES = 'http://localhost:3000/categories';
 
   function loadCategories() {
-    fetch(API_CATEGORIES)
-      .then(res => res.json())
-      .then(data => {
-        categoryTable.innerHTML = `
-          <tr>
-            <th>Nombre</th>
-            <th>Editar</th>
-            <th>Eliminar</th>
-          </tr>`;
-        data.forEach(cat => addCategoryToTable(cat));
-      });
-  }
+  fetch(API_CATEGORIES, {
+    method: 'GET',
+    headers: {
+      'Cache-Control': 'no-cache'
+    },
+    cache: 'no-store'
+  })
+    .then(res => res.json())
+    .then(data => {
+      console.log("Categorías cargadas:", data); // 👀 Ver en consola
+      categoryTable.innerHTML = `
+        <tr>
+          <th>Nombre</th>
+          <th>Editar</th>
+          <th>Eliminar</th>
+        </tr>`;
+      data.forEach(cat => addCategoryToTable(cat));
+    })
+    .catch(err => console.error("Error cargando categorías:", err));
+}
 
   categoryForm.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -33,36 +42,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function addCategoryToTable(cat) {
     const row = categoryTable.insertRow();
-    row.insertCell().textContent = cat;
+    row.insertCell().textContent = cat.name;
 
     const editCell = row.insertCell();
     const editBtn = document.createElement('button');
     editBtn.textContent = '✏️';
     editBtn.className = 'btn blue';
-    editBtn.onclick = () => editCategory(cat);
+    editBtn.onclick = () => editCategory(cat.id, cat.name);
     editCell.appendChild(editBtn);
 
     const deleteCell = row.insertCell();
     const deleteBtn = document.createElement('button');
     deleteBtn.textContent = '🗑️';
     deleteBtn.className = 'btn red';
-    deleteBtn.onclick = () => deleteCategory(cat);
+    deleteBtn.onclick = () => deleteCategory(cat.id);
     deleteCell.appendChild(deleteBtn);
   }
 
-  function editCategory(oldName) {
+  function editCategory(id, oldName) {
     const newName = prompt('Nuevo nombre:', oldName);
     if (newName) {
-      fetch(`${API_CATEGORIES}/${oldName}`, {
+      fetch(`${API_CATEGORIES}/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ newName })
+        body: JSON.stringify({ name: newName })
       }).then(() => loadCategories());
     }
   }
 
-  function deleteCategory(name) {
-    fetch(`${API_CATEGORIES}/${name}`, { method: 'DELETE' })
+  function deleteCategory(id) {
+    fetch(`${API_CATEGORIES}/${id}`, { method: 'DELETE' })
       .then(() => loadCategories());
   }
 
