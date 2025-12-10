@@ -26,5 +26,19 @@
     "transactionAmount": "9000",
     "transactionCategory": "1",
     "transactionId": 1764877347032
+  },
+  {
+    "transactionType": "Egreso",
+    "transactionDescription": "CATARATAS MISIONES",
+    "transactionAmount": "1500000",
+    "transactionCategory": "8",
+    "transactionId": 1765392846694
+  },
+  {
+    "transactionType": "Ingreso",
+    "transactionDescription": "COMISION",
+    "transactionAmount": "2500000",
+    "transactionCategory": "3",
+    "transactionId": 1765393164385
   }
 ]
